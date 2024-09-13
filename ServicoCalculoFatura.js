@@ -1,20 +1,24 @@
 class ServicoCalculoFatura {
-    getPeca(pecas, apre) {
-        return pecas[apre.id];
+    constructor(repo) {
+        this.repo = repo;
     }
 
-    calcularCredito(pecas, apre) {
+    getPeca(apre) {
+        return this.repo.getPeca(apre);
+    }
+
+    calcularCredito(apre) {
         let creditos = 0;
         creditos += Math.max(apre.audiencia - 30, 0);
-        if (this.getPeca(pecas, apre).tipo === "comedia")
+        if (this.repo.getPeca(apre).tipo === "comedia")
             creditos += Math.floor(apre.audiencia / 5);
         return creditos;
     }
 
-    calcularTotalCreditos(pecas, apresentacoes) {
+    calcularTotalCreditos(apresentacoes) {
         let creditos = 0;
         for (let apre of apresentacoes) {
-            creditos += this.calcularCredito(pecas, apre)
+            creditos += this.calcularCredito(apre)
         }
         return creditos
     }
@@ -42,10 +46,10 @@ class ServicoCalculoFatura {
         return total
     }
 
-    calcularTotalFatura(pecas, apresentacoes) {
+    calcularTotalFatura(apresentacoes) {
         let totalFatura = 0;
         for (let apre of apresentacoes) {
-            let total = this.calcularTotalApresentacao(this.getPeca(pecas, apre), apre);
+            let total = this.calcularTotalApresentacao(this.repo.getPeca(apre), apre);
             totalFatura += total;
         }
         return totalFatura

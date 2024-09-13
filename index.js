@@ -1,14 +1,15 @@
-const ServicoCalculoFatura = require('./ServicoCalculoFatura'); // ou o nome correto do arquivo
+const ServicoCalculoFatura = require('./ServicoCalculoFatura');
+const Repositorio = require('./Repositorio');
 
 const { readFileSync } = require('fs');
 
-function gerarFaturaStr(fatura, pecas, calc) {
+function gerarFaturaStr(fatura, calc) {
   let faturaStr = `Fatura ${fatura.cliente}\n`;
   for (let apre of fatura.apresentacoes) {
-    faturaStr += `  ${calc.getPeca(pecas, apre).nome}: ${formatarMoeda(calc.calcularTotalApresentacao(calc.getPeca(pecas, apre), apre))} (${apre.audiencia} assentos)\n`;
+    faturaStr += `  ${calc.repo.getPeca(apre).nome}: ${formatarMoeda(calc.calcularTotalApresentacao(calc.repo.getPeca(apre), apre))} (${apre.audiencia} assentos)\n`;
   }
-  faturaStr += `Valor total: ${formatarMoeda(calc.calcularTotalFatura(pecas, fatura.apresentacoes))}\n`;
-  faturaStr += `Créditos acumulados: ${calc.calcularTotalCreditos(pecas, fatura.apresentacoes)} \n`;
+  faturaStr += `Valor total: ${formatarMoeda(calc.calcularTotalFatura(fatura.apresentacoes))}\n`;
+  faturaStr += `Créditos acumulados: ${calc.calcularTotalCreditos(fatura.apresentacoes)} \n`;
   return faturaStr;
 }
 
@@ -34,10 +35,9 @@ function formatarMoeda(valor) {
 }
 
 
-const calc = new ServicoCalculoFatura();
 const faturas = JSON.parse(readFileSync('./faturas.json'));
-const pecas = JSON.parse(readFileSync('./pecas.json'));
-const faturaStr = gerarFaturaStr(faturas, pecas, calc);
-// const faturaHtml = gerarFaturaHTML(faturas, pecas, calc);
+const calc = new ServicoCalculoFatura(new Repositorio());
+const faturaStr = gerarFaturaStr(faturas, calc);
 console.log(faturaStr);
+// const faturaHtml = gerarFaturaHTML(faturas, pecas, calc);
 // console.log(faturaHtml);
